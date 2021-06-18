@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/nmrshll/oauth2-noserver)](https://goreportcard.com/report/github.com/nmrshll/oauth2-noserver)
+[![Go Report Card](https://goreportcard.com/badge/github.com/metrumresearchgroup/oauth2-noserver)](https://goreportcard.com/report/github.com/metrumresearchgroup/oauth2-noserver)
 
 # oauth2-noserver
 Simplifying the oauth2 auth flow for desktop / cli apps that have no server side.
@@ -12,7 +12,7 @@ So here's how it works !
 
 # Installation
 
-Run `go get -u github.com/nmrshll/oauth2-noserver`
+Run `go get -u github.com/metrumresearchgroup/oauth2-noserver`
 
 Try out the included example with `make example`
 
@@ -22,7 +22,7 @@ Try out the included example with `make example`
 You must set the redirection URL to `http://127.0.0.1:14565/oauth/callback` for this library to function properly.
 
 
-<img src="https://raw.githubusercontent.com/nmrshll/oauth2-noserver/master/.docs/creating-oauth-apps.png" alt="bitbucket example" title="bitbucket example"  width="50%"/>
+<img src="https://raw.githubusercontent.com/metrumresearchgroup/oauth2-noserver/master/.docs/creating-oauth-apps.png" alt="bitbucket example" title="bitbucket example"  width="50%"/>
 
 Once done you should get credentials (`client id` and `client secret`) to use in your code.
 
@@ -54,11 +54,6 @@ func main() {
 The `AuthURL` and `TokenURL` can be found in the service's oauth documentation.
 
 # Contributing
-Have improvement ideas or want to help ? Please start by opening an [issue](https://github.com/nmrshll/oauth2-noserver/issues) 
-
-### Related
-Used in:
-- [google photos client library](https://github.com/nmrshll/google-photos-api-client-go)
-- [google photos uploader cli](https://github.com/nmrshll/gphotos-uploader-cli)
+Have improvement ideas or want to help ? Please start by opening an [issue](https://github.com/metrumresearchgroup/oauth2-noserver/issues) 
 
 #### License: [MIT](./.docs/LICENSE)
