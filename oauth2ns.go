@@ -155,7 +155,7 @@ func startHTTPServer(ctx context.Context, conf *oauth2.Config) (clientChan chan 
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
-		fmt.Println("Server gracefully stopped")
+		log.Println("Server gracefully stopped")
 	}()
 
 	return clientChan, stopHTTPServerChan, cancelAuthentication
@@ -166,7 +166,7 @@ func callbackHandler(ctx context.Context, oauthConfig *oauth2.Config, clientChan
 		requestStateString := ctx.Value(oauthStateStringContextKey).(string)
 		responseStateString := r.FormValue("state")
 		if responseStateString != requestStateString {
-			fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", requestStateString, responseStateString)
+			log.Printf("invalid oauth state, expected '%s', got '%s'\n", requestStateString, responseStateString)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
@@ -174,7 +174,7 @@ func callbackHandler(ctx context.Context, oauthConfig *oauth2.Config, clientChan
 		code := r.FormValue("code")
 		token, err := oauthConfig.Exchange(ctx, code)
 		if err != nil {
-			fmt.Printf("oauthoauthConfig.Exchange() failed with '%s'\n", err)
+			log.Printf("oauthoauthConfig.Exchange() failed with '%s'\n", err)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
 		}
