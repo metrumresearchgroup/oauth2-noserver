@@ -40,6 +40,8 @@ type Config struct {
 	Port int `yaml:"port" json:"port"`
 	Timeout int `yaml:"timeout" json:"timeout"`
 	StateStringContextKey int `yaml:"state-string-context-key" json:"state-string-context-key"`
+	//Path is the callback URL to mount on the listener
+	Path string `yaml:"path" json:"path"`
 }
 
 type AuthenticateUserOption func(*AuthenticateUserFuncConfig) error
@@ -75,7 +77,11 @@ func AuthenticateUser(oauthConfig *oauth2.Config, appConfig Config, options ...A
 
 	// Redirect user to consent page to ask for permission
 	// for the scopes specified above.
-	oauthConfig.RedirectURL = fmt.Sprintf("http://%s:%s/oauth/callback", "localhost", strconv.Itoa(appConfig.Port))
+	oauthConfig.RedirectURL = fmt.Sprintf("http://%s:%s/%s",
+		"localhost",
+		strconv.Itoa(appConfig.Port),
+		appConfig.Path,
+	)
 
 	// Some random string, random for each request
 	oauthStateString := rndm.String(8)
