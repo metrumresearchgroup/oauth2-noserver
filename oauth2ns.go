@@ -77,7 +77,7 @@ func AuthenticateUser(oauthConfig *oauth2.Config, appConfig Config, options ...A
 
 	// Redirect user to consent page to ask for permission
 	// for the scopes specified above.
-	oauthConfig.RedirectURL = fmt.Sprintf("http://%s:%s/%s",
+	oauthConfig.RedirectURL = fmt.Sprintf("http://%s:%s%s",
 		"localhost",
 		strconv.Itoa(appConfig.Port),
 		appConfig.Path,
@@ -143,7 +143,7 @@ func startHTTPServer(ctx context.Context, conf *oauth2.Config, appConfig Config)
 	stopHTTPServerChan = make(chan struct{})
 	cancelAuthentication = make(chan struct{})
 
-	http.HandleFunc("/oauth/callback", callbackHandler(ctx, conf, clientChan,appConfig))
+	http.HandleFunc(fmt.Sprintf("%s",appConfig.Path), callbackHandler(ctx, conf, clientChan,appConfig))
 	srv := &http.Server{Addr: ":" + strconv.Itoa(appConfig.Port)}
 
 	// handle server shutdown signal
