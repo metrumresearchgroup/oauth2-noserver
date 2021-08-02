@@ -144,7 +144,7 @@ func startHTTPServer(ctx context.Context, conf *oauth2.Config, appConfig Config)
 	stopHTTPServerChan = make(chan struct{})
 	cancelAuthentication = make(chan struct{})
 
-	router := mux.NewRouter()
+  router := mux.NewRouter()
 	router.HandleFunc(appConfig.Path, callbackHandler(ctx, conf, clientChan,appConfig))
 	srv := &http.Server{Addr: ":" + strconv.Itoa(appConfig.Port), Handler: router}
 
