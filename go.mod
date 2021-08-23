@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/fatih/color v1.12.0
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/nmrshll/rndm-go v0.0.0-20170430161430-8da3024e53de
 	github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966

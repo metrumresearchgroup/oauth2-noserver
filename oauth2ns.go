@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"net/url"
@@ -143,8 +144,9 @@ func startHTTPServer(ctx context.Context, conf *oauth2.Config, appConfig Config)
 	stopHTTPServerChan = make(chan struct{})
 	cancelAuthentication = make(chan struct{})
 
-	http.HandleFunc(fmt.Sprintf("%s",appConfig.Path), callbackHandler(ctx, conf, clientChan,appConfig))
-	srv := &http.Server{Addr: ":" + strconv.Itoa(appConfig.Port)}
+  router := mux.NewRouter()
+	router.HandleFunc(appConfig.Path, callbackHandler(ctx, conf, clientChan,appConfig))
+	srv := &http.Server{Addr: ":" + strconv.Itoa(appConfig.Port), Handler: router}
 
 	// handle server shutdown signal
 	go func() {
