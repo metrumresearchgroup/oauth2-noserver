@@ -118,12 +118,6 @@ func AuthenticateUser(oauthConfig *oauth2.Config, appConfig Config, options ...A
 	}
 	time.Sleep(600 * time.Millisecond)
 
-	// shutdown the server after timeout
-	go func(ctx context.Context) {
-		<-ctx.Done()
-		stopHTTPServerChan <- struct{}{}
-	}(appConfig.Context)
-
 	select {
 	// wait for client on clientChan
 	case client := <-clientChan:
