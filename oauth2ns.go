@@ -36,11 +36,11 @@ type AuthorizedClient struct {
 //)
 
 type Config struct {
-	IP string `yaml:"ip" json:"ip"`
-	DeviceName string `yaml:"device-name" json:"device-name"`
-	Port int `yaml:"port" json:"port"`
-	Timeout int `yaml:"timeout" json:"timeout"`
-	StateStringContextKey int `yaml:"state-string-context-key" json:"state-string-context-key"`
+	IP                    string          `yaml:"ip" json:"ip"`
+	DeviceName            string          `yaml:"device-name" json:"device-name"`
+	Port                  int             `yaml:"port" json:"port"`
+	Context               context.Context `yaml:"-" json:"-"`
+	StateStringContextKey int             `yaml:"state-string-context-key" json:"state-string-context-key"`
 	//Path is the callback URL to mount on the listener
 	Path string `yaml:"path" json:"path"`
 }
@@ -107,7 +107,7 @@ func AuthenticateUser(oauthConfig *oauth2.Config, appConfig Config, options ...A
 	//	urlString = fmt.Sprintf("%s&device_id=%s&device_name=%s", urlString, DEVICE_NAME, DEVICE_NAME)
 	//}
 
-	clientChan, stopHTTPServerChan, cancelAuthentication := startHTTPServer(ctx, oauthConfig,appConfig)
+	clientChan, stopHTTPServerChan, cancelAuthentication := startHTTPServer(ctx, oauthConfig, appConfig)
 	log.Println(color.CyanString("You will now be taken to your browser for authentication or open the url below in a browser."))
 	log.Println(color.CyanString(urlString))
 	log.Println(color.CyanString("If you are opening the url manually on a different machine you will need to curl the result url on this machine manually."))
@@ -119,21 +119,24 @@ func AuthenticateUser(oauthConfig *oauth2.Config, appConfig Config, options ...A
 	time.Sleep(600 * time.Millisecond)
 
 	// shutdown the server after timeout
-	go func() {
-		log.Printf("Authentication will be cancelled in %s seconds", strconv.Itoa(appConfig.Timeout))
-		time.Sleep(time.Duration(appConfig.Timeout) * time.Second)
+	go func(ctx context.Context) {
+		<-ctx.Done()
 		stopHTTPServerChan <- struct{}{}
-	}()
+	}(appConfig.Context)
 
 	select {
 	// wait for client on clientChan
 	case client := <-clientChan:
-		// After the callbackHandler returns a client, it's time to shutdown the server gracefully
+		// After the callbackHandler returns a client, it's time to shut down the server gracefully
 		stopHTTPServerChan <- struct{}{}
 		return client, nil
-
+	case <-ctx.Done():
+		stopHTTPServerChan <- struct{}{}
+		return nil, fmt.Errorf("context for authorization was cancelled")
 		// if authentication process is cancelled first return an error
 	case <-cancelAuthentication:
+		// Making sure the server is torn down even in this pathway
+		stopHTTPServerChan <- struct{}{}
 		return nil, fmt.Errorf("authentication timed out and was cancelled")
 	}
 }
@@ -144,8 +147,8 @@ func startHTTPServer(ctx context.Context, conf *oauth2.Config, appConfig Config)
 	stopHTTPServerChan = make(chan struct{})
 	cancelAuthentication = make(chan struct{})
 
-  router := mux.NewRouter()
-	router.HandleFunc(appConfig.Path, callbackHandler(ctx, conf, clientChan,appConfig))
+	router := mux.NewRouter()
+	router.HandleFunc(appConfig.Path, callbackHandler(ctx, conf, clientChan, appConfig))
 	srv := &http.Server{Addr: ":" + strconv.Itoa(appConfig.Port), Handler: router}
 
 	// handle server shutdown signal
