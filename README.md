@@ -53,6 +53,10 @@ func main() {
 
 The `AuthURL` and `TokenURL` can be found in the service's oauth documentation.
 
+# Contexts
+The Refresh functions were previously built around a timer and a shut-down. It makes more sense to just pass
+a context down into those functions from a higher level with their own deadlines / timeouts.
+
 # Contributing
 Have improvement ideas or want to help ? Please start by opening an [issue](https://github.com/metrumresearchgroup/oauth2-noserver/issues) 
 
